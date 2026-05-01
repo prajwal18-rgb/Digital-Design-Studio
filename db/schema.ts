@@ -1,31 +1,31 @@
 import {
-  mysqlTable,
-  mysqlEnum,
+  pgTable,
+  pgEnum,
   serial,
   varchar,
   text,
   timestamp,
-  bigint,
-} from "drizzle-orm/mysql-core";
+  integer,
+} from "drizzle-orm/pg-core";
 
-export const users = mysqlTable("users", {
+export const roleEnum = pgEnum("role", ["user", "admin"]);
+export const statusEnum = pgEnum("status", ["pending", "confirmed", "cancelled"]);
+
+export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   unionId: varchar("unionId", { length: 255 }).notNull().unique(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 320 }),
   avatar: text("avatar"),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: roleEnum("role").default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => new Date()),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   lastSignInAt: timestamp("lastSignInAt").defaultNow().notNull(),
 });
 
-export const reservationRequests = mysqlTable("reservation_requests", {
+export const reservationRequests = pgTable("reservation_requests", {
   id: serial("id").primaryKey(),
-  userId: bigint("userId", { mode: "number", unsigned: true }),
+  userId: integer("userId"),
   checkInDate: varchar("checkInDate", { length: 64 }).notNull(),
   checkOutDate: varchar("checkOutDate", { length: 64 }).notNull(),
   guests: varchar("guests", { length: 32 }).notNull(),
@@ -34,11 +34,11 @@ export const reservationRequests = mysqlTable("reservation_requests", {
   fullName: varchar("fullName", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
   message: text("message"),
-  status: mysqlEnum("status", ["pending", "confirmed", "cancelled"]).default("pending").notNull(),
+  status: statusEnum("status").default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
-export const contactSubmissions = mysqlTable("contact_submissions", {
+export const contactSubmissions = pgTable("contact_submissions", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
@@ -49,22 +49,7 @@ export const contactSubmissions = mysqlTable("contact_submissions", {
 
 export type ReservationRequest = typeof reservationRequests.$inferSelect;
 export type InsertReservationRequest = typeof reservationRequests.$inferInsert;
-
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertContactSubmission = typeof contactSubmissions.$inferInsert;
-
-// TODO: Add your tables here. See docs/Database.md for schema examples and patterns.
-//
-// Example:
-// export const posts = mysqlTable("posts", {
-//   id: serial("id").primaryKey(),
-//   title: varchar("title", { length: 255 }).notNull(),
-//   content: text("content"),
-//   createdAt: timestamp("created_at").notNull().defaultNow(),
-// });
-//
-// Note: FK columns referencing a serial() PK must use:
-//   bigint("columnName", { mode: "number", unsigned: true }).notNull()
