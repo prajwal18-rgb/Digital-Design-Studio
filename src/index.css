@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 150 20% 98%;
+    --foreground: 155 40% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 155 40% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 155 40% 8%;
+    --primary: 42 40% 55%;
+    --primary-foreground: 155 40% 8%;
+    --secondary: 155 15% 92%;
+    --secondary-foreground: 155 40% 8%;
+    --muted: 155 15% 92%;
+    --muted-foreground: 155 15% 42%;
+    --accent: 42 40% 55%;
+    --accent-foreground: 155 40% 8%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 155 15% 85%;
+    --input: 155 15% 85%;
+    --ring: 42 40% 55%;
+    --radius: 0.5rem;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "PP Neue Montreal", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background-color: #F7FAF9;
+    color: #0D1B16;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background-color: #C4A35A;
+    color: #0D1B16;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: "Instrument Serif", Georgia, serif;
+  }
+
+  .font-mono-label {
+    font-family: "Geist Mono", "SF Mono", "Fira Code", monospace;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(196, 163, 90, 0.15);
+    border-radius: 20px;
+  }
+
+  .glass-input {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(196, 163, 90, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: #F7FAF9;
+    transition: all 0.3s ease;
+  }
+
+  .glass-input:focus {
+    outline: none;
+    border-color: #C4A35A;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .glass-input::placeholder {
+    color: rgba(247, 250, 249, 0.5);
+  }
+}
+
+/* Marquee animation */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - 1rem));
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 20s linear infinite;
+}
+
+/* Smooth will-change for animated elements */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7FAF9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C4A35A;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a88b4a;
+}
