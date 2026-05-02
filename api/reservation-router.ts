@@ -20,7 +20,7 @@ export const reservationRouter = createRouter({
     )
     .mutation(async ({ input }) => {
       const db = getDb();
-      const result = await db.insert(reservationRequests).values({
+      await db.insert(reservationRequests).values({
         userId: input.userId ?? null,
         checkInDate: input.checkInDate,
         checkOutDate: input.checkOutDate,
@@ -31,6 +31,6 @@ export const reservationRouter = createRouter({
         email: input.email,
         message: input.message ?? null,
       });
-      return { id: Number(result[0].insertId), success: true };
+      return { success: true };
     }),
 });
