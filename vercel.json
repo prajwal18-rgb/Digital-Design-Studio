@@ -1,5 +1,10 @@
 {
   "buildCommand": "vite build",
   "outputDirectory": "dist/public",
-  "framework": "vite"
+  "framework": "vite",
+  "functions": {
+    "api/trpc/[trpc].ts": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
