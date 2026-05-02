@@ -2,7 +2,7 @@ import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { appRouter } from "../router";
 import { createContext } from "../context";
 
-export const config = { runtime: "edge" };
+export const config = { runtime: "nodejs20.x" };
 
 export default function handler(req: Request) {
   return fetchRequestHandler({
