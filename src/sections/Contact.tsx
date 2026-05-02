@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { trpc } from '@/providers/trpc'
+import { supabase } from '@/lib/supabase'
 import { Send, CheckCircle } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -15,13 +15,7 @@ export default function Contact() {
     message: '',
   })
   const [submitted, setSubmitted] = useState(false)
-
-  const contactMutation = trpc.contact.submit.useMutation({
-    onSuccess: () => {
-      setSubmitted(true)
-      setFormData({ name: '', email: '', businessType: '', message: '' })
-    },
-  })
+  const [isPending, setIsPending] = useState(false)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -38,14 +32,24 @@ export default function Contact() {
         ease: 'power3.out',
       })
     }, sectionRef)
-
     return () => ctx.revert()
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.name || !formData.email || !formData.message) return
-    contactMutation.mutate(formData)
+    setIsPending(true)
+    const { error } = await supabase.from('contact_submissions').insert([{
+      name: formData.name,
+      email: formData.email,
+      businessType: formData.businessType || null,
+      message: formData.message,
+    }])
+    setIsPending(false)
+    if (!error) {
+      setSubmitted(true)
+      setFormData({ name: '', email: '', businessType: '', message: '' })
+    }
   }
 
   return (
@@ -55,7 +59,6 @@ export default function Contact() {
       className="relative overflow-hidden"
       style={{ padding: '160px 5vw' }}
     >
-      {/* Nature image background */}
       <div
         className="absolute inset-0 w-full h-full"
         style={{
@@ -66,11 +69,7 @@ export default function Contact() {
           transform: 'translateZ(0)',
         }}
       />
-
-      {/* Dark overlay */}
       <div className="absolute inset-0" style={{ background: 'rgba(13, 27, 22, 0.78)' }} />
-
-      {/* Content */}
       <div
         className="contact-content relative z-10"
         style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}
@@ -78,7 +77,6 @@ export default function Contact() {
         <p className="font-mono-label" style={{ color: '#C4A35A', marginBottom: 16 }}>
           Get in Touch
         </p>
-
         <h2
           className="font-display"
           style={{
@@ -91,17 +89,9 @@ export default function Contact() {
         >
           Ready to Build Something Great?
         </h2>
-
-        <p
-          style={{
-            fontSize: 18,
-            color: 'rgba(247, 250, 249, 0.7)',
-            marginBottom: 48,
-          }}
-        >
+        <p style={{ fontSize: 18, color: 'rgba(247, 250, 249, 0.7)', marginBottom: 48 }}>
           Tell us about your project and we will get back to you within 24 hours.
         </p>
-
         {submitted ? (
           <div
             className="flex flex-col items-center gap-4"
@@ -115,9 +105,7 @@ export default function Contact() {
             }}
           >
             <CheckCircle size={48} color="#C4A35A" />
-            <h3 style={{ fontSize: 24, color: '#F7FAF9', fontWeight: 500 }}>
-              Message Sent!
-            </h3>
+            <h3 style={{ fontSize: 24, color: '#F7FAF9', fontWeight: 500 }}>Message Sent!</h3>
             <p style={{ fontSize: 16, color: 'rgba(247, 250, 249, 0.7)' }}>
               Thank you for reaching out. We will be in touch soon.
             </p>
@@ -167,36 +155,20 @@ export default function Contact() {
                 required
               />
             </div>
-
             <select
               value={formData.businessType}
               onChange={(e) => setFormData({ ...formData, businessType: e.target.value })}
               className="glass-input"
               style={{ color: formData.businessType ? '#F7FAF9' : 'rgba(247, 250, 249, 0.5)' }}
             >
-              <option value="" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Business Type
-              </option>
-              <option value="dental" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Dental Clinic
-              </option>
-              <option value="restaurant" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Restaurant / Cafe
-              </option>
-              <option value="retail" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Retail / Mall Shop
-              </option>
-              <option value="furniture" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Furniture Store
-              </option>
-              <option value="electronics" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Electronics Shop
-              </option>
-              <option value="other" style={{ background: '#1A2E26', color: '#F7FAF9' }}>
-                Other
-              </option>
+              <option value="" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Business Type</option>
+              <option value="dental" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Dental Clinic</option>
+              <option value="restaurant" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Restaurant / Cafe</option>
+              <option value="retail" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Retail / Mall Shop</option>
+              <option value="furniture" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Furniture Store</option>
+              <option value="electronics" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Electronics Shop</option>
+              <option value="other" style={{ background: '#1A2E26', color: '#F7FAF9' }}>Other</option>
             </select>
-
             <textarea
               placeholder="Tell us about your project..."
               value={formData.message}
@@ -205,10 +177,9 @@ export default function Contact() {
               rows={4}
               required
             />
-
             <button
               type="submit"
-              disabled={contactMutation.isPending}
+              disabled={isPending}
               className="flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 disabled:opacity-60"
               style={{
                 background: '#C4A35A',
@@ -222,12 +193,7 @@ export default function Contact() {
                 marginTop: 8,
               }}
             >
-              {contactMutation.isPending ? 'Sending...' : (
-                <>
-                  Send Message
-                  <Send size={16} />
-                </>
-              )}
+              {isPending ? 'Sending...' : <><Send size={16} /> Send Message</>}
             </button>
           </form>
         )}
