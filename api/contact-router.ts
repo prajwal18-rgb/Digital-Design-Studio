@@ -15,15 +15,14 @@ export const contactRouter = createRouter({
     )
     .mutation(async ({ input }) => {
       const db = getDb();
-      const result = await db.insert(contactSubmissions).values({
+      await db.insert(contactSubmissions).values({
         name: input.name,
         email: input.email,
         businessType: input.businessType || null,
         message: input.message,
       });
-      return { success: true, id: Number(result[0].insertId) };
+      return { success: true };
     }),
-
   list: publicQuery.query(async () => {
     const db = getDb();
     return db.select().from(contactSubmissions).orderBy(contactSubmissions.createdAt);
